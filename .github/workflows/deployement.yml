@@ -37,7 +37,7 @@ jobs:
     deploy-dev:
       
       needs: [build-and-test]
-      if: github.ref == 'refs/head/dev'
+      if: github.ref == 'refs/heads/dev'
 
       runs-on: ubuntu-latest
       environment:
@@ -46,7 +46,7 @@ jobs:
 
       steps:
         - name: Download Candidate artifacts
-          uses: actions/download-artifacts@v3 
+          uses: actions/download-artifact@v4 
           with:
             name: archive.zip
 
