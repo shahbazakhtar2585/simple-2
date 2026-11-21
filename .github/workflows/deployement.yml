@@ -35,7 +35,7 @@ jobs:
                 path: build/libs  
 
     deploy-dev:
-      
+
       needs: [build-and-test]
       if: github.ref == 'refs/heads/dev'
 
@@ -45,17 +45,17 @@ jobs:
         url: https://github.com/${{ github.repository }}/releases/tag/v${{ vars.DEV_VERSION }}
 
       steps:
-        - name: Download Candidate artifacts
-          uses: actions/download-artifact@v4 
-          with:
+        - name: Download Candidate Artifacts
+          uses: actions/download-artifact@v4
+          with: 
             name: archive.zip
 
-        - name: release to dev
-          uses: softprops/action-gh-release@v0.1.15   
-          with:
-            tag_name: v${{vars.DEV_VERSION}}
-            token: ${{secrets.DEV_TOKEN}}
+        - name: rlease to dev
+          uses: softprops/action-gh-release@v0.1.15 
+          with: 
+            tag_name: v${{ vars.DEV_VERSION }}
+            token: ${{ secrets.DEV_TOKEN }}
             prerelease: true
             draft: true
             name: dev
-            files: greetings-deploy.jar  
+            files: greetings-deploy.jar
