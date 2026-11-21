@@ -58,4 +58,4 @@ jobs:
             prerelease: true
             draft: true
             name: dev
-            files: *.jar  
+            files: greetings-deploy.jar  
