@@ -53,6 +53,11 @@ jobs:
           uses: actions/download-artifact@v4
           with: 
             name: archive.zip
+        
+        - name: Verify Jar
+          run: |
+            echo "Downloaded file:"
+            find  release-files -type f
 
         - name: rlease to dev
           uses: softprops/action-gh-release@v0.1.15 
