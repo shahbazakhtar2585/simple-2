@@ -2,15 +2,27 @@
 name: Create GitHub Issue
 
 on:
-  workflow_dispatch:
+  # Run from another workflow
+  workflow_call:
     inputs:
       title:
-        description: 'Enter Issue Title'
+        description: 'Issue title'
+        required: true
+        type: string
+      body:
+        description: 'Issue description'
         required: true
         type: string
 
+  # Run manually from GitHub Actions
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Enter issue title'
+        required: true
+        type: string
       body:
-        description: 'Enter Issue Description'
+        description: 'Enter issue description'
         required: true
         type: string
 
@@ -22,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create Issue
+      - name: Create Issue using REST API
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_TITLE: ${{ inputs.title }}
@@ -30,14 +42,17 @@ jobs:
 
         run: |
           jq -n \
-            --arg title "$ISSUE_TITLE" \
-            --arg body "$ISSUE_BODY" \
+            --arg title "Failure: $ISSUE_TITLE" \
+            --arg body "Details: $ISSUE_BODY" \
             '{title: $title, body: $body}' > issue.json
 
-          curl --fail-with-body \
+          RESPONSE=$(curl --silent --show-error --fail-with-body \
             --request POST \
             --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues" \
             --header "Authorization: Bearer $GH_TOKEN" \
             --header "Accept: application/vnd.github+json" \
             --header "Content-Type: application/json" \
-            --data @issue.json
+            --data @issue.json)
+
+          echo "Issue created successfully!"
+          echo "$RESPONSE" | jq '{number, title, html_url}'
