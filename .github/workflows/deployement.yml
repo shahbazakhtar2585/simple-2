@@ -1,19 +1,43 @@
-name: Demo Workflow
+
+name: Create GitHub Issue
 
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Select environment'
+      title:
+        description: 'Enter Issue Title'
         required: true
-        type: choice
-        options:
-          - dev
-          - production
+        type: string
+
+      body:
+        description: 'Enter Issue Description'
+        required: true
+        type: string
+
+permissions:
+  issues: write
 
 jobs:
-  deploy:
+  create_issue:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Show Environment
-        run: echo "Deploying to ${{ inputs.environment }}"
+      - name: Create Issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_TITLE: ${{ inputs.title }}
+          ISSUE_BODY: ${{ inputs.body }}
+
+        run: |
+          jq -n \
+            --arg title "$ISSUE_TITLE" \
+            --arg body "$ISSUE_BODY" \
+            '{title: $title, body: $body}' > issue.json
+
+          curl --fail-with-body \
+            --request POST \
+            --url "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues" \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            --header "Content-Type: application/json" \
+            --data @issue.json
